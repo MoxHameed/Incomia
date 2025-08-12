@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Incomia Jobs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <h1>Incomia Jobs</h1>
+
+    <h2>Sign up</h2>
+    <input id="su-email" type="email" placeholder="Email" />
+    <input id="su-pass" type="password" placeholder="Password" />
+    <button id="btn-signup">Sign up</button>
+
+    <h2>Login</h2>
+    <input id="li-email" type="email" placeholder="Email" />
+    <input id="li-pass" type="password" placeholder="Password" />
+    <button id="btn-login">Login</button>
+
+    <h2>Status</h2>
+    <div id="auth-status">Not logged in</div>
+    <button id="btn-logout">Logout</button>
+
+    <!-- Supabase Client -->
+    <script type="module">
+      import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+      const supabaseUrl = 'https://tishuvqsjuveltywcuhl.supabase.co';
+      const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpc2h1dnFzanV2ZWx0eXdjdWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMTgxMzgsImV4cCI6MjA3MDU5NDEzOH0.ko5ULRx9s2gdCBKNRmZX8W-AIgWSVpPdAHRqvAdHW5s';
+
+      const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+      // Sign up
+      document.getElementById('btn-signup').onclick = async () => {
+        const email = document.getElementById('su-email').value;
+        const password = document.getElementById('su-pass').value;
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) alert(error.message);
+        else alert('Signed up! Please check your email to confirm (if enabled).');
+      };
+
+      // Login
+      document.getElementById('btn-login').onclick = async () => {
+        const email = document.getElementById('li-email').value;
+        const password = document.getElementById('li-pass').value;
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) alert(error.message);
+        else {
+          alert('Logged in!');
+          updateAuthStatus();
+        }
+      };
+
+      // Logout
+      document.getElementById('btn-logout').onclick = async () => {
+        await supabase.auth.signOut();
+        updateAuthStatus();
+      };
+
+      // Show logged in status
+      async function updateAuthStatus() {
+        const { data: { user } } = await supabase.auth.getUser();
+        document.getElementById('auth-status').innerText = user ? `Logged in as ${user.email}` : 'Not logged in';
+      }
+
+      updateAuthStatus();
+    </script>
+  </body>
+</html>
